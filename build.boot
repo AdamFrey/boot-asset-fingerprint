@@ -14,6 +14,6 @@
   pom {:project 'afrey/boot-asset-fingerprint
        :version +version+
        :description "Boot task to fingerprint asset references in html files."
-       :url "https://github.com/pointslope/boot-fingerprint"
-       :scm {:url "https://github.com/pointslope/boot-fingerprint"}
+       :url "https://github.com/AdamFrey/boot-asset-fingerprint"
+       :scm {:url "https://github.com/AdamFrey/boot-asset-fingerprint"}
        :license {"EPL" "http://www.eclipse.org/legal/epl-v10.html"}})
