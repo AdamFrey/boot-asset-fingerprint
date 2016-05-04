@@ -8,7 +8,7 @@
 (defn- pod-deps []
   (remove pod/dependency-loaded? '[[enlive "1.1.6"]]))
 
-(defn- init
+(defn- pod-init
   [fresh-pod]
   (pod/with-eval-in fresh-pod
     (require '[afrey.boot-asset-fingerprint.impl])))
@@ -26,16 +26,16 @@
   [s skip bool "Skips file fingerprinting and replaces each asset url with bare TODO"]
 
   (let [updated-env (update (core/get-env) :dependencies into (pod-deps))
-        pods (pod/pod-pool updated-env :init init)]
+        pods (pod/pod-pool updated-env :init pod-init)
+        tmp-dir (core/tmp-dir!)]
     (core/cleanup (pods :shutdown))
     (core/with-pre-wrap fileset
+      (core/empty-dir! tmp-dir)
       (let [worker-pod (pods :refresh)
-            tmp-dir (core/tmp-dir!)
             html-files (fileset->html-files fileset)
             file-hashes (into {}
                           (map (juxt :path :hash))
                           (core/output-files fileset))]
-
         (doseq [file html-files
                 :let [path (:path file)
                       input-path (-> file core/tmp-file .getPath)
