@@ -17,3 +17,8 @@
        :url "https://github.com/AdamFrey/boot-asset-fingerprint"
        :scm {:url "https://github.com/AdamFrey/boot-asset-fingerprint"}
        :license {"EPL" "http://www.eclipse.org/legal/epl-v10.html"}})
+
+(deftask dev []
+  (comp
+    (watch)
+    (build-jar)))
