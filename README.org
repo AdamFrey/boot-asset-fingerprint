@@ -2,18 +2,52 @@
 
 [[http://clojars.org/afrey/boot-asset-fingerprint][http://clojars.org/afrey/boot-asset-fingerprint/latest-version.svg]]
 
-A boot task to add a cache-busting fingerprint to asset-references in
+A boot task to add a cache-busting fingerprint to asset references in
 HTML files.
+** Usage
+To give an asset a fingerprint, surround the path reference with a
+~${...}~ syntax.
+
+#+BEGIN_SRC
+<link href="${app.css}" rel="stylesheet">
+#+END_SRC
+
+Then require the namespace and add the ~asset-fingerprint~ task.
+
+#+BEGIN_SRC clojure
+(require '[afrey.boot-asset-fingerprint :refer [asset-fingerprint]])
+
+(deftask build []
+  (comp
+    (asset-fingerprint)
+    (target)))
+#+END_SRC
+
+You probably only want to fingerprint files in a production build and
+not when building your project incrementally in development mode. The
+~asset-fingerprint~ task takes a ~:skip~ option which replace each
+asset reference with the bare, unfingerprinted version.
+
+#+BEGIN_SRC clojure
+
+(deftask dev []
+  (comp
+    (watch)
+    (asset-fingerprint :skip true)
+    (target)))
+#+END_SRC
+
+Check the ~example~ directory for a working usage example.
+
 ** FAQ
 *** Alternatives?
-There is another library [[https://github.com/pointslope/boot-fingerprint][boot-fingerprint]] that
-`boot-asset-fingerprint` drew inspiration from. Both libraries use
-Enlive's syntax for asset references. As of version `0.1.2-SNAPSHOT`,
-`boot-fingerprint` does not use Boot pods to isolate its dependencies
-on Enlive and Pandect. It uses deprecated boot core functions. And
-also it has no built in caching, so it will re-run the fingerprint
-task on your html files on each file change regardless of whether any
-html file changed.
+There is another library [[https://github.com/pointslope/boot-fingerprint][boot-fingerprint]] that boot-asset-fingerprint
+drew inspiration from. Both libraries use the ~${...}~ syntax for asset
+references. As of version ~0.1.2-SNAPSHOT~, boot-fingerprint does not
+use Boot pods to isolate its dependencies on Enlive and Pandect. It
+uses deprecated boot core functions. Crucially, it has no built in
+caching, so it will re-run the fingerprint task on your html files on
+each file change regardless of whether any html file changed.
 ** Todo
 - [ ] get relative paths with "../" to work
 
