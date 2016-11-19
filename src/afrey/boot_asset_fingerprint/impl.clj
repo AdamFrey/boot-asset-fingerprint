@@ -3,11 +3,13 @@
             [clojure.java.io :as io]))
 
 (defn asset-full-path
-  "Return the full path of an asset, taking into account relative and absolute paths TODO"
-  ;; (asset-root "foo.txt" "") => "foo.txt"
-  ;; (asset-root "/foo.txt" "") => "foo.txt"
-  ;; (asset-root "/foo.txt" "parent") => "foo.txt"
-  ;; (asset-root "foo.txt" "parent") => "parent/foo.txt"
+  "Return the full path of an asset, taking into account relative and absolute paths.
+
+  Examples:
+  (asset-full-path \"foo.txt\" \"\") => \"foo.txt\"
+  (asset-full-path \"/foo.txt\" \"\") => \"foo.txt\"
+  (asset-full-path \"/foo.txt\" \"parent\") => \"foo.txt\"
+  (asset-full-path \"foo.txt\" \"parent\") => \"parent/foo.txt\""
 
   [path relative-root]
   (let [separator (java.io.File/separator)]
