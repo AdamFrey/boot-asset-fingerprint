@@ -5,7 +5,7 @@
                   [tailrecursion/boot-jetty "0.1.3" :scope "test"]])
 
 (require
-  '[afrey.boot-asset-fingerprint :refer [asset-fingerprint] :as fing]
+  '[afrey.boot-asset-fingerprint :refer [asset-fingerprint]]
   '[tailrecursion.boot-jetty :as jetty]
   '[clojure.java.io :as io])
 
