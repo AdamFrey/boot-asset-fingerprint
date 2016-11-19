@@ -16,7 +16,7 @@
        :description "Boot task to fingerprint asset references in html files."
        :url "https://github.com/AdamFrey/boot-asset-fingerprint"
        :scm {:url "https://github.com/AdamFrey/boot-asset-fingerprint"}
-       :license {"EPL" "http://www.eclipse.org/legal/epl-v10.html"}})
+       :license {"MIT" "https://opensource.org/licenses/MIT"}})
 
 (deftask dev []
   (comp

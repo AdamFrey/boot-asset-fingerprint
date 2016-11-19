@@ -4,7 +4,10 @@
 
 A boot task to add a cache-busting fingerprint to asset-references in
 HTML files.
-** Ok
+** Todo
 - [ ] get relative paths with "../" to work
 
+** Copyright and License
+Copyright © 2016 Adam Frey
 
+Licensed under the MIT License (see the LICENSE file).
