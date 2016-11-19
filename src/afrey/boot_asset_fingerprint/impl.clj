@@ -29,15 +29,16 @@
 (defn template [input-file {:keys [skip file-hashes input-root]}]
   (html/template (html/html-resource input-file)
     []
-    [html/any-node] (html/replace-vars
-                      (fn [asset-name]
-                        (let [asset-path (subs (str asset-name) 1)]
-                          (if skip
-                            asset-path
+    [html/any-node]
+    (html/replace-vars
+      (fn [asset-name]
+        (let [asset-path (subs (str asset-name) 1)]
+          (if skip
+            asset-path
 
-                            (let [full-path (asset-full-path asset-path input-root)
-                                  fingerprint (get file-hashes full-path)]
-                              (fingerprint-asset asset-path fingerprint))))))))
+            (let [full-path (asset-full-path asset-path input-root)
+                  fingerprint (get file-hashes full-path)]
+              (fingerprint-asset asset-path fingerprint))))))))
 
 
 (defn fingerprint
