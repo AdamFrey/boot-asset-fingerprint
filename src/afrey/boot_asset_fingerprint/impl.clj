@@ -17,7 +17,9 @@
       ;; absolute path
       (subs path 1)
       ;; relative path
-      (str relative-root separator path))))
+      (if (empty? relative-root)
+        path
+        (str relative-root separator path)))))
 
 (defn fingerprint-asset [asset-path fingerprint]
   (if fingerprint
