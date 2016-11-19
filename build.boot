@@ -4,11 +4,11 @@
                   [adzerk/bootlaces "0.1.13"   :scope "test"]])
 
 (require
-  '[adzerk.bootlaces :refer :all]) ;; tasks: build-jar push-snapshot push-release
+  '[adzerk.bootlaces :as deploy])
 
 (def +version+ "1.0.0")
 
-(bootlaces! +version+)
+(deploy/bootlaces! +version+)
 
 (task-options!
   pom {:project     'afrey/boot-asset-fingerprint
@@ -21,4 +21,14 @@
 (deftask dev []
   (comp
     (watch)
-    (build-jar)))
+    (deploy/build-jar)))
+
+(deftask push-release []
+  (comp
+    (deploy/build-jar)
+    (#'deploy/collect-clojars-credentials)
+    (push
+      :tag            true
+      :gpg-sign       false
+      :ensure-release true
+      :repo           "deploy-clojars")))
