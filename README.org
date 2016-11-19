@@ -4,6 +4,16 @@
 
 A boot task to add a cache-busting fingerprint to asset-references in
 HTML files.
+** FAQ
+*** Alternatives?
+There is another library [[https://github.com/pointslope/boot-fingerprint][boot-fingerprint]] that
+`boot-asset-fingerprint` drew inspiration from. Both libraries use
+Enlive's syntax for asset references. As of version `0.1.2-SNAPSHOT`,
+`boot-fingerprint` does not use Boot pods to isolate its dependencies
+on Enlive and Pandect. It uses deprecated boot core functions. And
+also it has no built in caching, so it will re-run the fingerprint
+task on your html files on each file change regardless of whether any
+html file changed.
 ** Todo
 - [ ] get relative paths with "../" to work
 
