@@ -1,0 +1,10 @@
+* boot-asset-fingerprint
+
+[[http://clojars.org/afrey/boot-asset-fingerprint][http://clojars.org/afrey/boot-asset-fingerprint/latest-version.svg]]
+
+A boot task to add a cache-busting fingerprint to asset-references in
+HTML files.
+** Ok
+- [ ] get relative paths with "../" to work
+
+
