@@ -6,9 +6,6 @@
             [boot.task.built-in :as built-in]
             [clojure.java.io :as io]))
 
-(defn- pod-deps []
-  (remove pod/dependency-loaded? '[[enlive "1.1.6"]]))
-
 (defn- pod-init
   [fresh-pod]
   (pod/with-eval-in fresh-pod
@@ -24,11 +21,10 @@
 
 (core/deftask asset-fingerprint
   "Fingerprint files in a pod"
-  [s skip bool "Skips file fingerprinting and replaces each asset url with bare TODO"]
+  [s skip bool "Skips file fingerprinting and replaces each asset url with bare"]
 
   (let [prev        (atom nil)
-        updated-env (update (core/get-env) :dependencies into (pod-deps))
-        pods        (pod/pod-pool updated-env :init pod-init)
+        pods        (pod/pod-pool (core/get-env) :init pod-init)
         tmp-dir     (core/tmp-dir!)]
     (core/cleanup (pods :shutdown))
     (core/with-pre-wrap fileset
