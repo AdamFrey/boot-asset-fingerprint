@@ -21,7 +21,13 @@
   (or (-> path io/file .getParent) ""))
 
 (core/deftask asset-fingerprint
-  "Fingerprint files in a pod"
+  "Replace asset references with a URL query-parameter based on the hash contents.
+
+  The main purpose of doing this is for cache-busting static assets
+  that were deployed with a far-future expiration date. See the Ruby
+  on Rails Asset Pipeline guide, segment \"What is Fingerprinting and
+  Why Should I Care\" for a detailed explanation of why you want to do this.
+  (http://guides.rubyonrails.org/asset_pipeline.html#what-is-fingerprinting-and-why-should-i-care-questionmark) "
   [s skip            bool  "Skips file fingerprinting and replaces each asset url with bare"
    e extensions  EXT  [str] "Add a file extension to indicate the files to process for asset references."
    _ asset-host HOST str   "Host to prefix all asset urls with"
