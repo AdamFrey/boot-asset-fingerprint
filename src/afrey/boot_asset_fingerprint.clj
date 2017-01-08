@@ -4,7 +4,8 @@
             [boot.pod :as pod]
             [boot.util :as util]
             [boot.task.built-in :as built-in]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            [afrey.boot-asset-fingerprint.impl :as impl]))
 
 (defn- pod-init
   [fresh-pod]
@@ -26,14 +27,11 @@
    _ asset-host HOST str   "Host to prefix all asset urls with"
    ]
   (let [prev        (atom nil)
-        pods        (pod/pod-pool (core/get-env) :init pod-init)
         tmp-dir     (core/tmp-dir!)
         extensions (or extensions [".html"])]
-    (core/cleanup (pods :shutdown))
     (core/with-pre-wrap fileset
       (core/empty-dir! tmp-dir)
       (let [diff        (core/fileset-diff @prev fileset)
-            worker-pod  (pods :refresh)
             html-files  (fileset->html-files diff extensions)
             file-hashes (into {}
                           (map (juxt :path :hash))
@@ -46,13 +44,12 @@
                       input-root (path->parent-path path)]]
           (do
             (util/info "Fingerprinting %s...\n" path)
-            (pod/with-eval-in worker-pod
-              (afrey.boot-asset-fingerprint.impl/fingerprint
-                ~{:input-path  input-path
-                  :input-root  input-root
-                  :output-path output-path
-                  :fingerprint? (not skip)
-                  :asset-host asset-host
-                  :file-hashes file-hashes}))))
+            (impl/fingerprint
+             {:input-path  input-path
+              :input-root  input-root
+              :output-path output-path
+              :fingerprint? (not skip)
+              :asset-host asset-host
+              :file-hashes file-hashes})))
 
         (-> fileset (core/add-resource tmp-dir) core/commit!)))))
