@@ -45,7 +45,7 @@
                       output-path (-> (io/file tmp-dir path) .getPath)
                       input-root (path->parent-path path)]]
           (do
-            (util/info (format "Fingerprinting %s...\n" path))
+            (util/info "Fingerprinting %s...\n" path)
             (pod/with-eval-in worker-pod
               (afrey.boot-asset-fingerprint.impl/fingerprint
                 ~{:input-path  input-path
