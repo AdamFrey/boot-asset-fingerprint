@@ -1,7 +1,7 @@
 (set-env!
   :resource-paths #{"resources"}
   :dependencies '[[org.clojure/clojure "1.8.0"]
-                  [afrey/boot-asset-fingerprint "1.0.0"]
+                  [afrey/boot-asset-fingerprint "1.1.0-SNAPSHOT"]
                   [tailrecursion/boot-jetty "0.1.3" :scope "test"]])
 
 (require
@@ -11,6 +11,7 @@
 (deftask dev []
   (comp
     (watch)
-    (asset-fingerprint)
+    (asset-fingerprint :extension [".css"])
+    (asset-fingerprint :extension [".html"])
     (jetty/serve :port 5000)
     (target)))
