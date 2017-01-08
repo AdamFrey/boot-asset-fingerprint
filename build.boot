@@ -6,7 +6,7 @@
 (require
   '[adzerk.bootlaces :as deploy])
 
-(def +version+ "1.0.0")
+(def +version+ "1.1.0-SNAPSHOT")
 
 (deploy/bootlaces! +version+)
 
