@@ -11,6 +11,8 @@ of [keepachangelog.com](http://keepachangelog.com/).
 
 - A new task option `asset-host`. Used for specifying a hostname that
   will be prepended to all asset references.
+- A new task option to specify one or more file extensions to process
+  for asset-references `${...}` to replace.
 
 ## [0.1.0] - 2016-06-08
 ### Initial Release

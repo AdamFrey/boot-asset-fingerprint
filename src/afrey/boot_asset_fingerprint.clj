@@ -11,10 +11,10 @@
   (pod/with-eval-in fresh-pod
     (require '[afrey.boot-asset-fingerprint.impl])))
 
-(defn- fileset->html-files [fileset]
+(defn- fileset->html-files [fileset extensions]
   (->> fileset
     (core/output-files)
-    (core/by-ext [".html"])))
+    (core/by-ext extensions)))
 
 (defn path->parent-path [path]
   (or (-> path io/file .getParent) ""))
@@ -22,17 +22,19 @@
 (core/deftask asset-fingerprint
   "Fingerprint files in a pod"
   [s skip            bool  "Skips file fingerprinting and replaces each asset url with bare"
-   e extension  EXT  [str] "Add a file extension to indicate the files to process for asset references."
+   e extensions  EXT  [str] "Add a file extension to indicate the files to process for asset references."
+   _ asset-host HOST str   "Host to prefix all asset urls with"
    ]
   (let [prev        (atom nil)
         pods        (pod/pod-pool (core/get-env) :init pod-init)
-        tmp-dir     (core/tmp-dir!)]
+        tmp-dir     (core/tmp-dir!)
+        extensions (or extensions [".html"])]
     (core/cleanup (pods :shutdown))
     (core/with-pre-wrap fileset
       (core/empty-dir! tmp-dir)
       (let [diff        (core/fileset-diff @prev fileset)
             worker-pod  (pods :refresh)
-            html-files  (fileset->html-files diff)
+            html-files  (fileset->html-files diff extensions)
             file-hashes (into {}
                           (map (juxt :path :hash))
                           (core/output-files fileset))]
