@@ -33,7 +33,7 @@ asset reference with the bare, unfingerprinted version.
 (deftask dev []
   (comp
     (watch)
-    (asset-fingerprint :skip true)
+    (asset-fingerprint :skip true :asset-host "http://assets.example.com")
     (target)))
 #+END_SRC
 

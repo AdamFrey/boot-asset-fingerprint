@@ -21,8 +21,9 @@
 
 (core/deftask asset-fingerprint
   "Fingerprint files in a pod"
-  [s skip bool "Skips file fingerprinting and replaces each asset url with bare"]
-
+  [s skip            bool  "Skips file fingerprinting and replaces each asset url with bare"
+   e extension  EXT  [str] "Add a file extension to indicate the files to process for asset references."
+   ]
   (let [prev        (atom nil)
         pods        (pod/pod-pool (core/get-env) :init pod-init)
         tmp-dir     (core/tmp-dir!)]
@@ -48,7 +49,8 @@
                 ~{:input-path  input-path
                   :input-root  input-root
                   :output-path output-path
-                  :skip        skip
+                  :fingerprint? (not skip)
+                  :asset-host asset-host
                   :file-hashes file-hashes}))))
 
         (-> fileset (core/add-resource tmp-dir) core/commit!)))))

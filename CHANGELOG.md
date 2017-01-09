@@ -7,6 +7,10 @@ of [keepachangelog.com](http://keepachangelog.com/).
 ## [Unreleased]
 
 [Unreleased]: https://github.com/AdamFrey/boot-asset-fingerprint/compare/0.1.0...HEAD
+### Added
+
+- A new task option `asset-host`. Used for specifying a hostname that
+  will be prepended to all asset references.
 
 ## [0.1.0] - 2016-06-08
 ### Initial Release

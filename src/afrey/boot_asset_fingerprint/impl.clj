@@ -23,19 +23,38 @@
       :else
       (str relative-root separator path))))
 
-(defn fingerprint-asset [asset-path fingerprint]
-  (if fingerprint
-    (str asset-path "?v=" fingerprint)
-    asset-path))
+(defn fingerprint-asset [asset-path {:keys [input-root file-hashes]}]
+  (let [full-path (asset-full-path (str asset-path) input-root)
+        fingerprint (get file-hashes full-path)]
+    (if fingerprint
+      (str asset-path "?v=" fingerprint)
+      asset-path)))
 
-(defn lookup-fn [{:keys [skip file-hashes input-root]}]
+(defn- last-index [s]
+  (dec (count s)))
+
+(defn- drop-last-char [s]
+  (subs s 0 (last-index s)))
+
+(defn- drop-trailing-slash [path]
+  (if (= (get path (last-index path)) \/)
+    (drop-last-char path)
+    path))
+
+(defn- absolutize-path [path]
+  (let [separator (java.io.File/separator)]
+    (if (= (subs path 0 1) separator)
+      path
+      (str "/" path))))
+
+(defn prepend-asset-host [asset-path asset-host]
+  (str (drop-trailing-slash asset-host) (absolutize-path asset-path)))
+
+(defn lookup-fn [{:keys [fingerprint? asset-host] :as opts}]
   (fn [[_ asset-path]]
-    (if skip
-      asset-path
-
-      (let [full-path (asset-full-path (str asset-path) input-root)
-            fingerprint (get file-hashes full-path)]
-        (fingerprint-asset asset-path fingerprint)))))
+    (cond-> asset-path
+      fingerprint? (fingerprint-asset opts)
+      asset-host   (prepend-asset-host asset-host))))
 
 (defn fingerprint
   [{:keys [input-path output-path] :as opts}]
