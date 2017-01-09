@@ -1,10 +1,13 @@
 (set-env!
   :source-paths #{"src"}
-  :dependencies '[[org.clojure/clojure "1.8.0" :scope "provided"]
-                  [adzerk/bootlaces "0.1.13"   :scope "test"]])
+  :dependencies '[[org.clojure/clojure "1.8.0"  :scope "provided"]
+                  [boot/core           "2.1.0"  :scope "provided"]
+                  [adzerk/bootlaces    "0.1.13" :scope "test"]
+                  [adzerk/boot-test    "1.1.2"  :scope "test"]])
 
 (require
-  '[adzerk.bootlaces :as deploy])
+ '[adzerk.bootlaces :as deploy]
+ '[adzerk.boot-test :as boot-test])
 
 (def +version+ "1.1.0-SNAPSHOT")
 
@@ -22,6 +25,20 @@
   (comp
     (watch)
     (deploy/build-jar)))
+
+(deftask development []
+  (merge-env! :source-paths ["test"])
+  identity)
+
+;;; This prevents a name collision WARNING between the test task and
+;;; clojure.core/test, a function that nobody really uses or cares
+;;; about.
+(ns-unmap 'boot.user 'test)
+
+(deftask test []
+  (comp
+   (development)
+   (boot-test/test)))
 
 (deftask push-release []
   (comp

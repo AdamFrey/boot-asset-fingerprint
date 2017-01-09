@@ -13,13 +13,15 @@
 
   [path relative-root]
   (let [separator (java.io.File/separator)]
-    (if (= (subs path 0 1) separator)
-      ;; absolute path
+    (cond
+      (= (subs path 0 1) separator)
       (subs path 1)
-      ;; relative path
-      (if (empty? relative-root)
-        path
-        (str relative-root separator path)))))
+
+      (empty? relative-root)
+      path
+
+      :else
+      (str relative-root separator path))))
 
 (defn fingerprint-asset [asset-path fingerprint]
   (if fingerprint
