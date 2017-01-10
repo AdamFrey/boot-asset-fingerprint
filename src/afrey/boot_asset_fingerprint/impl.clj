@@ -1,6 +1,6 @@
 (ns afrey.boot-asset-fingerprint.impl
-  (:require [net.cgrand.enlive-html :as html]
-            [clojure.java.io :as io]))
+  (:require [clojure.java.io :as io]
+            [clojure.string :as str]))
 
 (defn asset-full-path
   "Return the full path of an asset, taking into account relative and absolute paths.
@@ -13,36 +13,53 @@
 
   [path relative-root]
   (let [separator (java.io.File/separator)]
-    (if (= (subs path 0 1) separator)
-      ;; absolute path
+    (cond
+      (= (subs path 0 1) separator)
       (subs path 1)
-      ;; relative path
-      (if (empty? relative-root)
-        path
-        (str relative-root separator path)))))
 
-(defn fingerprint-asset [asset-path fingerprint]
-  (if fingerprint
-    (str asset-path "?v=" fingerprint)
-    asset-path))
+      (empty? relative-root)
+      path
 
-(defn template [input-file {:keys [skip file-hashes input-root]}]
-  (html/template (html/html-resource input-file)
-    []
-    [html/any-node]
-    (html/replace-vars
-      (fn [asset-name]
-        (let [asset-path (subs (str asset-name) 1)]
-          (if skip
-            asset-path
+      :else
+      (str relative-root separator path))))
 
-            (let [full-path (asset-full-path asset-path input-root)
-                  fingerprint (get file-hashes full-path)]
-              (fingerprint-asset asset-path fingerprint))))))))
+(defn fingerprint-asset [asset-path {:keys [input-root file-hashes]}]
+  (let [full-path   (asset-full-path (str asset-path) input-root)
+        fingerprint (get file-hashes full-path)]
+    (if fingerprint
+      (str asset-path "?v=" fingerprint)
+      asset-path)))
 
+(defn- last-index [s]
+  (dec (count s)))
+
+(defn- drop-last-char [s]
+  (subs s 0 (last-index s)))
+
+(defn- drop-trailing-slash [path]
+  (if (= (get path (last-index path)) \/)
+    (drop-last-char path)
+    path))
+
+(defn- absolutize-path [path]
+  (let [separator (java.io.File/separator)]
+    (if (= (subs path 0 1) separator)
+      path
+      (str "/" path))))
+
+(defn prepend-asset-host [asset-path asset-host]
+  (str (drop-trailing-slash asset-host) (absolutize-path asset-path)))
+
+(defn lookup-fn [{:keys [fingerprint? asset-host] :as opts}]
+  (fn [[_ asset-path]]
+    (cond-> asset-path
+      fingerprint? (fingerprint-asset opts)
+      asset-host   (prepend-asset-host asset-host))))
 
 (defn fingerprint
   [{:keys [input-path output-path] :as opts}]
   (let [out (io/file output-path)]
     (io/make-parents out)
-    (spit out (reduce str ((template (io/file input-path) opts))))))
+    (as-> (slurp input-path) $
+      (str/replace $ #"\$\{(.+?)\}" (lookup-fn opts))
+      (spit out $))))
