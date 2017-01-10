@@ -3,15 +3,15 @@ All notable changes to this project will be documented in this
 file. This change log follows the conventions
 of [keepachangelog.com](http://keepachangelog.com/).
 
-## [Unreleased]
-
-[Unreleased]: https://github.com/AdamFrey/boot-asset-fingerprint/compare/0.1.0...HEAD
+## [0.1.1] - 2017-01-09
 ### Added
 
 - A new task option `asset-host`. Used for specifying a hostname that
   will be prepended to all asset references.
 - A new task option to specify one or more file extensions to process
   for asset-references `${...}` to replace.
+
+[0.1.1]: https://github.com/AdamFrey/boot-asset-fingerprint/compare/0.1.0...0.1.1
 
 ## [0.1.0] - 2016-06-08
 ### Initial Release
