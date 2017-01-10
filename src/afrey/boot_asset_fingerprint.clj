@@ -1,16 +1,9 @@
 (ns afrey.boot-asset-fingerprint
   {:boot/export-tasks true}
   (:require [boot.core :as core]
-            [boot.pod :as pod]
             [boot.util :as util]
-            [boot.task.built-in :as built-in]
             [clojure.java.io :as io]
             [afrey.boot-asset-fingerprint.impl :as impl]))
-
-(defn- pod-init
-  [fresh-pod]
-  (pod/with-eval-in fresh-pod
-    (require '[afrey.boot-asset-fingerprint.impl])))
 
 (defn- fileset->html-files [fileset extensions]
   (->> fileset
