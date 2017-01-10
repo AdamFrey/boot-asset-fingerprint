@@ -11,7 +11,6 @@
 (deftask dev []
   (comp
     (watch)
-    (asset-fingerprint :extension [".css"])
-    (asset-fingerprint :extension [".html"])
+    (asset-fingerprint :extension [".css" ".html"])
     (jetty/serve :port 5000)
     (target)))
