@@ -6,8 +6,8 @@
                   [adzerk/boot-test    "1.1.2"  :scope "test"]])
 
 (require
- '[adzerk.bootlaces :as deploy]
- '[adzerk.boot-test :as boot-test])
+  '[adzerk.bootlaces :as deploy]
+  '[adzerk.boot-test :as boot-test])
 
 (def +version+ "1.1.0-SNAPSHOT")
 
@@ -34,8 +34,8 @@
 
 (deftask test []
   (comp
-   (development)
-   (boot-test/test)))
+    (development)
+    (boot-test/test)))
 
 (deftask push-release []
   (comp
