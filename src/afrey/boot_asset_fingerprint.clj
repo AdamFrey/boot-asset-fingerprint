@@ -5,7 +5,7 @@
             [clojure.java.io :as io]
             [afrey.boot-asset-fingerprint.impl :as impl]))
 
-(defn- fileset->html-files [fileset extensions]
+(defn- filter-by-extns [fileset extensions]
   (->> fileset
     (core/output-files)
     (core/by-ext extensions)))
@@ -31,12 +31,12 @@
     (core/with-pre-wrap fileset
       (core/empty-dir! tmp-dir)
       (let [diff        (core/fileset-diff @prev fileset)
-            html-files  (fileset->html-files diff extensions)
+            files       (filter-by-extns diff extensions)
             file-hashes (into {}
                           (map (juxt :path :hash))
                           (core/output-files fileset))]
         (reset! prev fileset)
-        (doseq [file html-files
+        (doseq [file files
                 :let [path (:path file)
                       input-path (-> file core/tmp-file .getPath)
                       output-path (-> (io/file tmp-dir path) .getPath)
