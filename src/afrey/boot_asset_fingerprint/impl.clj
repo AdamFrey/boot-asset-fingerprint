@@ -24,7 +24,7 @@
       (str relative-root separator path))))
 
 (defn fingerprint-asset [asset-path {:keys [input-root file-hashes]}]
-  (let [full-path (asset-full-path (str asset-path) input-root)
+  (let [full-path   (asset-full-path (str asset-path) input-root)
         fingerprint (get file-hashes full-path)]
     (if fingerprint
       (str asset-path "?v=" fingerprint)
@@ -60,4 +60,6 @@
   [{:keys [input-path output-path] :as opts}]
   (let [out (io/file output-path)]
     (io/make-parents out)
-    (spit out (str/replace (slurp input-path) #"\$\{(.+?)\}" (lookup-fn opts)))))
+    (as-> (slurp input-path) $
+      (str/replace $ #"\$\{(.+?)\}" (lookup-fn opts))
+      (spit out $))))
