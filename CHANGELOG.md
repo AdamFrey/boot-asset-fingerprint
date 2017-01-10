@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this
 file. This change log follows the conventions
 of [keepachangelog.com](http://keepachangelog.com/).
 
-## [0.1.1] - 2017-01-09
+## [1.1.0] - 2017-01-09
 ### Added
 
 - A new task option `asset-host`. Used for specifying a hostname that
@@ -11,13 +11,13 @@ of [keepachangelog.com](http://keepachangelog.com/).
 - A new task option to specify one or more file extensions to process
   for asset-references `${...}` to replace.
 
-[0.1.1]: https://github.com/AdamFrey/boot-asset-fingerprint/compare/0.1.0...0.1.1
+[1.1.0]: https://github.com/AdamFrey/boot-asset-fingerprint/compare/1.0.0...1.1.0
 
-## [0.1.0] - 2016-06-08
+## [1.0.0] - 2016-06-08
 ### Initial Release
 
 - Implements an `asset-fingerprint` task for replacing references to
   asset files with URLs containing a query-param based on the hash of
   the contents of the file.
 
-[0.1.0]: https://github.com/AdamFrey/boot-asset-fingerprint/compare/d01ad09...0.1.0
+[1.0.0]: https://github.com/AdamFrey/boot-asset-fingerprint/compare/d01ad09...1.0.0
