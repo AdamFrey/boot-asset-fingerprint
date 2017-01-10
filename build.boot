@@ -30,9 +30,6 @@
   (merge-env! :source-paths ["test"])
   identity)
 
-;;; This prevents a name collision WARNING between the test task and
-;;; clojure.core/test, a function that nobody really uses or cares
-;;; about.
 (ns-unmap 'boot.user 'test)
 
 (deftask test []
