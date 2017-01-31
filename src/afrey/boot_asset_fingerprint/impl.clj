@@ -57,9 +57,5 @@
       asset-host   (prepend-asset-host asset-host))))
 
 (defn fingerprint
-  [{:keys [input-path output-path] :as opts}]
-  (let [out (io/file output-path)]
-    (io/make-parents out)
-    (as-> (slurp input-path) $
-      (str/replace $ #"\$\{(.+?)\}" (lookup-fn opts))
-      (spit out $))))
+  [text opts]
+  (str/replace text #"\$\{(.+?)\}" (lookup-fn opts)))

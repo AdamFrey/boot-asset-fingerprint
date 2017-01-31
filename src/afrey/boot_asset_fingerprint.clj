@@ -39,15 +39,16 @@
                 :let [path        (:path file)
                       input-path  (-> file core/tmp-file .getPath)
                       output-path (-> (io/file tmp-dir path) .getPath)
-                      input-root  (path->parent-path path)]]
+                      input-root  (path->parent-path path)
+                      out-file    (io/file output-path)]]
           (do
             (util/info "Fingerprinting %s...\n" path)
-            (impl/fingerprint
-              {:input-path   input-path
-               :input-root   input-root
-               :output-path  output-path
-               :fingerprint? (not skip)
-               :asset-host   asset-host
-               :file-hashes  file-hashes})))
+            (io/make-parents out-file)
+            (as-> (slurp input-path) $
+              (impl/fingerprint $ {:input-root   input-root
+                                   :fingerprint? (not skip)
+                                   :asset-host   asset-host
+                                   :file-hashes  file-hashes})
+              (spit out-file $))))
 
         (-> fileset (core/add-resource tmp-dir) core/commit!)))))
