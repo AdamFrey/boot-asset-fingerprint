@@ -28,7 +28,6 @@
         tmp-dir    (core/tmp-dir!)
         extensions (or extensions [".html"])]
     (core/with-pre-wrap fileset
-      (core/empty-dir! tmp-dir)
       (let [diff        (core/fileset-diff @prev fileset)
             files       (filter-by-extns diff extensions)
             file-hashes (into {}
