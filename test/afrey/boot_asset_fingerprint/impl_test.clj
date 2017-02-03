@@ -18,8 +18,8 @@
 (deftest test-fingerprint-asset
   (is (= (fingerprint-asset "/foo.txt" {:file-hashes {}})
          "/foo.txt"))
-  (is (= (fingerprint-asset "/foo.txt" {:file-hashes {"foo.txt" "barbaz"}})
-         "/foo.txt?v=barbaz")))
+  (is (= (fingerprint-asset "/foo.txt" {:file-hashes {"foo.txt" "/foo-barbaz.txt"}})
+         "/foo-barbaz.txt")))
 
 (deftest test-prepend-asset-host
   (testing "skip when no asset-host is given"
@@ -36,3 +36,9 @@
   (testing "drops a possible trailing slash on the asset host"
     (is (= (prepend-asset-host "/foo.txt" "assets.example.org/")
            "assets.example.org/foo.txt"))))
+
+(deftest test-fingerprint 
+  (testing "absolutizes path without fingerprint when no corresponding hash"
+    (is (= "/style.css" (fingerprint "${style.css}" {})))) 
+  (testing "replaces the template with the fingerprinted file"
+    (is (= "/style-123.css" (fingerprint "${style.css}" {:file-hashes {"style.css" "style-123.css"}})))))
