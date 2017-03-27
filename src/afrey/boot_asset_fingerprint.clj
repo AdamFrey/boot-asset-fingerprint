@@ -16,6 +16,9 @@
 (defn- add-fingerprint-to-filenames [fileset sources]
   (reduce (fn [fs [source dest]] (core/mv fs source dest)) fileset sources))
 
+(def default-source-extensions [".html"])
+(def default-asset-extensions [".js" ".css"])
+
 (core/deftask asset-fingerprint
   "Replace asset references with a URL query-parameter based on the hash contents.
 
@@ -34,10 +37,10 @@
       (let [sources     (->> fileset
                           (core/fileset-diff @prev)
                           (core/output-files)
-                          (core/by-ext (or extensions [".html"])))
+                          (core/by-ext (or extensions default-source-extensions)))
             file-hashes (into {}
                               (map (juxt :path :hash))
-                              (core/by-ext (or rename-extensions [".js" ".css"]) (core/output-files fileset)))
+                              (core/by-ext (or rename-extensions default-asset-extensions) (core/output-files fileset)))
             file-rename-hash (into {} (map fingerprint-file file-hashes))]
         (reset! prev fileset)
 
