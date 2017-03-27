@@ -26,10 +26,10 @@
     (watch)
     (deploy/build-jar)))
 
-(ns-unmap 'boot.user 'test)
-
-(deftask test []
-  (merge-env! :source-paths ["test"])
+(deftask run-tests []
+  (merge-env!
+    :source-paths ["test/src"]
+    :resoure-paths ["test/resources"])
   (boot-test/alt-test))
 
 (deftask push-release []

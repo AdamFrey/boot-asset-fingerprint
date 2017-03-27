@@ -37,7 +37,7 @@
     (is (= (prepend-asset-host "/foo.txt" "assets.example.org/")
            "assets.example.org/foo.txt"))))
 
-(deftest test-fingerprint 
+(deftest test-fingerprint
   (testing "absolutizes path without fingerprint when no corresponding hash"
     (is (= "/style.css" (fingerprint "${style.css}" {})))) 
   (testing "replaces the template with the fingerprinted file"
