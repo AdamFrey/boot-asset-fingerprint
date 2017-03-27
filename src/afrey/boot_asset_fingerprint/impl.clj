@@ -2,6 +2,19 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as str]))
 
+(def selector-regex #"\$\{(.+?)\}")
+
+(defn fingerprinted-asset-paths
+  "Given a collection of files returns a set of string paths to all desired
+  assets to fingeprint."
+  [fileset]
+  (into #{}
+    (comp
+      (map (fn [file]
+             (map second (re-seq selector-regex (slurp file)))))
+      cat)
+    fileset))
+
 (defn asset-full-path
   "Return the full path of an asset, taking into account relative and absolute paths.
 
@@ -56,4 +69,4 @@
 
 (defn fingerprint
   [text opts]
-  (str/replace text #"\$\{(.+?)\}" (lookup-fn opts)))
+  (str/replace text selector-regex (lookup-fn opts)))

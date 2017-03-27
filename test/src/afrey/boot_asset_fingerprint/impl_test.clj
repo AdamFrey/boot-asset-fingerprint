@@ -1,6 +1,16 @@
 (ns afrey.boot-asset-fingerprint.impl-test
   (:require [clojure.test :refer :all]
-            [afrey.boot-asset-fingerprint.impl :refer :all]))
+            [afrey.boot-asset-fingerprint.impl :refer :all]
+            [boot.core :as boot]
+            [clojure.java.io :as io]))
+
+(def test-index-file "test/resources/index.html")
+
+(deftest fingerprinted-asset-paths-test
+  (let [files [(io/file "test/resources/index.html")
+               (io/file "test/resources/other.html")]]
+    (is (= (fingerprinted-asset-paths files)
+           #{"test-1.js" "/test-2.css" "test-1.css"}))))
 
 (deftest test-asset-full-path
   (testing "absolute paths"
