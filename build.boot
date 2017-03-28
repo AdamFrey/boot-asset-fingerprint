@@ -29,7 +29,7 @@
 (deftask run-tests []
   (merge-env!
     :source-paths ["test/src"]
-    :resoure-paths ["test/resources"])
+    :resource-paths ["test/resources"])
   (boot-test/alt-test))
 
 (deftask push-release []
