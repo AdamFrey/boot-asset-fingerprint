@@ -6,7 +6,7 @@
 
 (def test-index-file "test/resources/index.html")
 
-(deftest fingerprinted-asset-paths-test
+#_(deftest fingerprinted-asset-paths-test
   (let [files [(io/file "test/resources/index.html")
                (io/file "test/resources/other.html")]]
     (is (= (fingerprinted-asset-paths files)
@@ -23,6 +23,9 @@
     (is (= (asset-full-path "foo.txt" "")
            "foo.txt"))
     (is (= (asset-full-path "foo.txt" "parent")
+           "parent/foo.txt"))
+
+    (is (= (asset-full-path "foo.txt" "parent/")
            "parent/foo.txt"))))
 
 (deftest test-fingerprint-asset

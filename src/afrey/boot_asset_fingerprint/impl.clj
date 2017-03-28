@@ -1,19 +1,21 @@
 (ns afrey.boot-asset-fingerprint.impl
   (:require [clojure.java.io :as io]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [boot.core :as boot]))
 
 (def selector-regex #"\$\{(.+?)\}")
 
-(defn fingerprinted-asset-paths
-  "Given a collection of files returns a set of string paths to all desired
-  assets to fingeprint."
-  [fileset]
-  (into #{}
-    (comp
-      (map (fn [file]
-             (map second (re-seq selector-regex (slurp file)))))
-      cat)
-    fileset))
+(defn file-parent
+  [file-path]
+  (re-find #"^.+\/" file-path))
+
+(defn- remove-leading-slash [s]
+  (when s
+    (str/replace s (re-pattern (str "^" (java.io.File/separator))) "")))
+
+(defn- remove-trailing-slash [s]
+  (when s
+    (str/replace s (re-pattern (str (java.io.File/separator) "$")) "")))
 
 (defn asset-full-path
   "Return the full path of an asset, taking into account relative and absolute paths.
@@ -34,7 +36,21 @@
       path
 
       :else
-      (str relative-root separator path))))
+      (str (remove-trailing-slash relative-root) separator path))))
+
+(defn fingerprinted-asset-paths
+  "Given a fileset returns a set of string paths to all desired
+  assets that should be fingerprinted."
+  [fileset]
+  (into #{}
+    (comp
+      (map (fn [file]
+             (let [file-text (slurp (boot/tmp-file file))]
+               (map (fn [[_ asset-path]]
+                      (asset-full-path asset-path (file-parent (:path file))))
+                 (re-seq selector-regex file-text)))))
+      cat)
+    fileset))
 
 (defn fingerprint-asset [asset-path {:keys [input-root file-hashes]}]
   (let [full-path (asset-full-path (str asset-path) input-root)]
