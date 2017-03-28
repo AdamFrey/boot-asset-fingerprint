@@ -8,6 +8,17 @@
 (defn path->parent-path [path]
   (or (-> path io/file .getParent) ""))
 
+(defn fingerprint-file [[path hash]]
+  (let [regex       #"(.*)\.([^.]*?)$"
+        replacement (clojure.string/replace path regex (str "$1-" hash ".$2"))]
+    [path replacement]))
+
+(defn- add-fingerprint-to-filenames [fileset sources]
+  (reduce (fn [fs [source dest]] (core/mv fs source dest))
+    fileset sources))
+
+(def default-source-extensions [".html"])
+
 (core/deftask asset-fingerprint
   "Replace asset references with a URL query-parameter based on the hash contents.
 
@@ -16,19 +27,23 @@
   on Rails Asset Pipeline guide, segment \"What is Fingerprinting and
   Why Should I Care\" for a detailed explanation of why you want to do this.
   (http://guides.rubyonrails.org/asset_pipeline.html#what-is-fingerprinting-and-why-should-i-care-questionmark) "
-  [s skip            bool  "Skips file fingerprinting and replaces each asset url with bare"
-   e extensions EXT  [str] "Add a file extension to indicate the files to process for asset references."
-   _ asset-host HOST str   "Host to prefix all asset urls with"]
+  [s skip                    bool  "Skips file fingerprinting and replaces each asset url with bare"
+   e extensions        EXT   [str] "Add a file extension to indicate the files to process for asset references."
+   _ asset-host        HOST  str   "Host to prefix all asset urls with e.g. https://your-host.com"]
   (let [prev       (atom nil)
         output-dir (core/tmp-dir!)]
     (core/with-pre-wrap fileset
-      (let [sources     (->> fileset
-                          (core/fileset-diff @prev)
-                          (core/output-files)
-                          (core/by-ext (or extensions [".html"])))
-            file-hashes (into {}
-                          (map (juxt :path :hash))
-                          (core/output-files fileset))]
+      (let [sources          (->> fileset
+                               (core/fileset-diff @prev)
+                               (core/output-files)
+                               (core/by-ext (or extensions default-source-extensions)))
+            desired-files    (impl/fingerprinted-asset-paths sources)
+            file-rename-hash (into {}
+                               (comp
+                                 (filter #(contains? desired-files (:path %)))
+                                 (map (juxt :path :hash))
+                                 (map fingerprint-file))
+                               (core/output-files fileset))]
         (reset! prev fileset)
 
         (when (seq sources)
@@ -45,9 +60,10 @@
                 (impl/fingerprint $ {:input-root   input-root
                                      :fingerprint? (not skip)
                                      :asset-host   asset-host
-                                     :file-hashes  file-hashes})
+                                     :file-hashes  file-rename-hash})
                 (spit out-file $)))))
 
         (-> fileset
+          (add-fingerprint-to-filenames file-rename-hash)
           (core/add-resource output-dir)
           (core/commit!))))))

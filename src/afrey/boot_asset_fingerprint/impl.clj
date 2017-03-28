@@ -1,6 +1,21 @@
 (ns afrey.boot-asset-fingerprint.impl
   (:require [clojure.java.io :as io]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [boot.core :as boot]))
+
+(def selector-regex #"\$\{(.+?)\}")
+
+(defn file-parent
+  [file-path]
+  (re-find #"^.+\/" file-path))
+
+(defn- remove-leading-slash [s]
+  (when s
+    (str/replace s (re-pattern (str "^" (java.io.File/separator))) "")))
+
+(defn- remove-trailing-slash [s]
+  (when s
+    (str/replace s (re-pattern (str (java.io.File/separator) "$")) "")))
 
 (defn asset-full-path
   "Return the full path of an asset, taking into account relative and absolute paths.
@@ -21,14 +36,25 @@
       path
 
       :else
-      (str relative-root separator path))))
+      (str (remove-trailing-slash relative-root) separator path))))
+
+(defn fingerprinted-asset-paths
+  "Given a fileset returns a set of string paths to all desired
+  assets that should be fingerprinted."
+  [fileset]
+  (into #{}
+    (comp
+      (map (fn [file]
+             (let [file-text (slurp (boot/tmp-file file))]
+               (map (fn [[_ asset-path]]
+                      (asset-full-path asset-path (file-parent (:path file))))
+                 (re-seq selector-regex file-text)))))
+      cat)
+    fileset))
 
 (defn fingerprint-asset [asset-path {:keys [input-root file-hashes]}]
-  (let [full-path   (asset-full-path (str asset-path) input-root)
-        fingerprint (get file-hashes full-path)]
-    (if fingerprint
-      (str asset-path "?v=" fingerprint)
-      asset-path)))
+  (let [full-path (asset-full-path (str asset-path) input-root)]
+    (get file-hashes full-path asset-path)))
 
 (defn- last-index [s]
   (dec (count s)))
@@ -48,14 +74,15 @@
       (str "/" path))))
 
 (defn prepend-asset-host [asset-path asset-host]
-  (str (drop-trailing-slash asset-host) (absolutize-path asset-path)))
+  (str (drop-trailing-slash asset-host) asset-path))
 
-(defn lookup-fn [{:keys [fingerprint? asset-host] :as opts}]
+(defn lookup-fn [{:keys [asset-host] :as opts}]
   (fn [[_ asset-path]]
     (cond-> asset-path
-      fingerprint? (fingerprint-asset opts)
+      :always      (fingerprint-asset opts)
+      :always      (absolutize-path)
       asset-host   (prepend-asset-host asset-host))))
 
 (defn fingerprint
   [text opts]
-  (str/replace text #"\$\{(.+?)\}" (lookup-fn opts)))
+  (str/replace text selector-regex (lookup-fn opts)))

@@ -1,15 +1,15 @@
 (set-env!
   :source-paths #{"src"}
-  :dependencies '[[org.clojure/clojure "1.8.0"  :scope "provided"]
-                  [boot/core           "2.1.0"  :scope "provided"]
-                  [adzerk/bootlaces    "0.1.13" :scope "test"]
-                  [metosin/boot-alt-test "0.2.1" :scope "test"]])
+  :dependencies '[[org.clojure/clojure   "1.8.0"  :scope "provided"]
+                  [boot/core             "2.1.0"  :scope "provided"]
+                  [adzerk/bootlaces      "0.1.13" :scope "test"]
+                  [metosin/boot-alt-test "0.2.1"  :scope "test"]])
 
 (require
   '[adzerk.bootlaces :as deploy]
   '[metosin.boot-alt-test :as boot-test])
 
-(def +version+ "1.2.0")
+(def +version+ "1.3.0")
 
 (deploy/bootlaces! +version+)
 
@@ -26,10 +26,10 @@
     (watch)
     (deploy/build-jar)))
 
-(ns-unmap 'boot.user 'test)
-
-(deftask test []
-  (merge-env! :source-paths ["test"])
+(deftask run-tests []
+  (merge-env!
+    :source-paths ["test/src"]
+    :resource-paths ["test/resources"])
   (boot-test/alt-test))
 
 (deftask push-release []
