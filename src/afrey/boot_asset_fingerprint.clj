@@ -9,12 +9,13 @@
   (or (-> path io/file .getParent) ""))
 
 (defn fingerprint-file [[path hash]]
-  (let [regex #"(.*)\.([^.]*?)$"
+  (let [regex       #"(.*)\.([^.]*?)$"
         replacement (clojure.string/replace path regex (str "$1-" hash ".$2"))]
     [path replacement]))
 
 (defn- add-fingerprint-to-filenames [fileset sources]
-  (reduce (fn [fs [source dest]] (core/mv fs source dest)) fileset sources))
+  (reduce (fn [fs [source dest]] (core/mv fs source dest))
+    fileset sources))
 
 (def default-source-extensions [".html"])
 
