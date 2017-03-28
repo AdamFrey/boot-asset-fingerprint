@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this
 file. This change log follows the conventions
 of [keepachangelog.com](http://keepachangelog.com/).
 
+## [1.3.0] - 2017-03-28
+### Changed
+- Changed asset fingerprinting strategy. Now instead of a query parameter at the
+  end of the url (/some.css?qwdfm...) files will be renamed to (/some-qwdfm.css)
+
 ## [1.2.0] - 2017-01-31
 ### Fixed
 - Fixed bug that would cause files not to be written to the classpath
