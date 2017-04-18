@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this
 file. This change log follows the conventions
 of [keepachangelog.com](http://keepachangelog.com/).
 
+## [1.3.1] - 2017-04-18
+### Fixed
+- Re-instated the ability to skip fingerprinting with the :skip task option
+
 ## [1.3.0] - 2017-03-28
 ### Changed
 - Changed asset fingerprinting strategy. Now instead of a query parameter at the

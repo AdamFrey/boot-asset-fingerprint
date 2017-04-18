@@ -78,10 +78,13 @@
 
 (defn lookup-fn [{:keys [asset-host] :as opts}]
   (fn [[_ asset-path]]
-    (cond-> asset-path
-      :always      (fingerprint-asset opts)
-      :always      (absolutize-path)
-      asset-host   (prepend-asset-host asset-host))))
+    (if (:skip? opts)
+      asset-path
+
+      (cond-> asset-path
+        :always    (fingerprint-asset opts)
+        :always    (absolutize-path)
+        asset-host (prepend-asset-host asset-host)))))
 
 (defn fingerprint
   [text opts]

@@ -9,7 +9,7 @@
   '[adzerk.bootlaces :as deploy]
   '[metosin.boot-alt-test :as boot-test])
 
-(def +version+ "1.3.0")
+(def +version+ "1.3.1")
 
 (deploy/bootlaces! +version+)
 
