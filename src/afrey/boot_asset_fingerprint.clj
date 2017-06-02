@@ -57,7 +57,15 @@
                                        :skip?       skip
                                        :asset-host  asset-host
                                        :file-hashes file-rename-hash})
-                  (spit out-file $))))
+                  (do
+                    (spit out-file $)
+                    (when-let [fingerprinted-out-file (some->> (and (not skip) file)
+                                                               (:path)
+                                                               (get file-rename-hash)
+                                                               (io/file output-dir))]
+                      (doto fingerprinted-out-file
+                        (io/make-parents)
+                        (spit $)))))))
 
             (when (not skip)
               (doseq [file (->> fileset
@@ -66,7 +74,8 @@
                       :let [out-file (->> file
                                        (:path)
                                        (get file-rename-hash)
-                                       (io/file output-dir))]]
+                                       (io/file output-dir))]
+                      :when (not (contains? (set (map :path sources)) (:path file)))]
                 (do
                   (io/make-parents out-file)
                   (io/copy (core/tmp-file file) out-file))))))
