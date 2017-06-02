@@ -74,7 +74,7 @@
                       :let [out-file (->> file
                                        (:path)
                                        (get file-rename-hash)
-                                       (io/file output-dir))]]
+                                       (io/file output-dir))]
                       :when (not (contains? (set (map :path sources)) (:path file)))]
                 (do
                   (io/make-parents out-file)
