@@ -61,20 +61,22 @@
                   (do
                     (spit out-file $)
                     (when-let [fingerprinted-out-file (some->> (and (not skip) file)
-                                                               (:path)
-                                                               (get file-rename-hash)
-                                                               (io/file output-dir))]
+                                                        (:path)
+                                                        (get file-rename-hash)
+                                                        (io/file output-dir))]
                       (doto fingerprinted-out-file
                         (io/make-parents)
                         (spit $)))))))
 
+            ;; Move files to fingeprinted name
             (when (not skip)
-              (doseq [file (->> fileset
-                             (core/input-files)
-                             (core/by-path (keys file-rename-hash)))
-                      :let [out-file (->> file
-                                       (:path)
-                                       (get file-rename-hash)
+              (doseq [file  (->> fileset
+                              (core/input-files)
+                              (core/by-path (keys file-rename-hash)))
+                      :let  [out-file (->> file
+                                        (:path)
+                                        (get file-rename-hash)
+                                        (io/file output-dir))]
                       :when (not (contains? sources-paths (:path file)))]
                 (do
                   (io/make-parents out-file)
