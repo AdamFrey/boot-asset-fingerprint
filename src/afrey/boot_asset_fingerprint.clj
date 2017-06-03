@@ -29,10 +29,11 @@
   (let [prev       (atom nil)
         output-dir (core/tmp-dir!)]
     (core/with-pre-wrap fileset
-      (let [sources (->> fileset
-                      (core/fileset-diff @prev)
-                      (core/input-files)
-                      (core/by-ext (or extensions default-source-extensions)))]
+      (let [sources       (->> fileset
+                            (core/fileset-diff @prev)
+                            (core/input-files)
+                            (core/by-ext (or extensions default-source-extensions)))
+            sources-paths (into #{} (map :path) sources)]
         (reset! prev fileset)
 
         (when (seq sources)
@@ -74,8 +75,7 @@
                       :let [out-file (->> file
                                        (:path)
                                        (get file-rename-hash)
-                                       (io/file output-dir))]
-                      :when (not (contains? (set (map :path sources)) (:path file)))]
+                      :when (not (contains? sources-paths (:path file)))]
                 (do
                   (io/make-parents out-file)
                   (io/copy (core/tmp-file file) out-file))))))
