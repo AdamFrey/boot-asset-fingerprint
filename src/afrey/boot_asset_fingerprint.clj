@@ -79,6 +79,7 @@
         (reset! prev fileset)
 
         (when (seq assets)
+          (util/info "Asset Fingerprinting...\n")
           (fingerprint-asset-files! assets file-rename-map output-dir))
 
         (doseq [file sources
