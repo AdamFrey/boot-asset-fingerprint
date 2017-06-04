@@ -1,7 +1,7 @@
 (set-env!
   :resource-paths #{"resources"}
   :dependencies '[[org.clojure/clojure "1.8.0"]
-                  [afrey/boot-asset-fingerprint "1.3.1"]
+                  [afrey/boot-asset-fingerprint "1.4.0"]
                   [tailrecursion/boot-jetty "0.1.3" :scope "test"]])
 
 (require
