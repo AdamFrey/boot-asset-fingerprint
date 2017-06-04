@@ -8,9 +8,10 @@
   '[afrey.boot-asset-fingerprint :refer [asset-fingerprint]]
   '[tailrecursion.boot-jetty :as jetty])
 
-(deftask dev []
+(deftask dev
+  [s skip bool]
   (comp
     (watch)
-    (asset-fingerprint :extensions [".css" ".html"])
+    (asset-fingerprint :extensions [".css" ".html"] :skip skip)
     (jetty/serve :port 5000)
     (target)))
