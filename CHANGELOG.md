@@ -3,6 +3,16 @@ All notable changes to this project will be documented in this
 file. This change log follows the conventions
 of [keepachangelog.com](http://keepachangelog.com/).
 
+## [1.4.0] - 2017-06-04
+### Fixed
+- Fix problems with recursive asset fingerprinting #5
+
+### Changed
+- The caching strategy has been removed until I can figure out all the
+  implications. So now asset-fingerprinting will rerun on every file change.
+  Which is a bit of a bummer, but at least I know there aren't weird bugs
+  because of it.
+
 ## [1.3.1] - 2017-04-18
 ### Fixed
 - Re-instated the ability to skip fingerprinting with the :skip task option
