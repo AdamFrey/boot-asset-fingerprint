@@ -86,6 +86,6 @@
         :always    (absolutize-path)
         asset-host (prepend-asset-host asset-host)))))
 
-(defn fingerprint
+(defn update-asset-references
   [text opts]
   (str/replace text selector-regex (lookup-fn opts)))
