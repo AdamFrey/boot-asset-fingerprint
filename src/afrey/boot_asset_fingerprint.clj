@@ -68,8 +68,7 @@
         skip?      (boolean skip)]
     (core/with-pre-wrap fileset
       (let [sources         (->> fileset
-                              ;; Diff against previous fileset
-                              #_(core/fileset-diff @prev)
+                              (core/fileset-diff @prev) ; Diff against previous fileset
                               (core/input-files)
                               (core/by-ext (or extensions default-source-extensions)))
             sources-paths   (into #{} (map :path) sources)
