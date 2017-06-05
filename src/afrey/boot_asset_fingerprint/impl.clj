@@ -1,7 +1,8 @@
 (ns afrey.boot-asset-fingerprint.impl
   (:require [clojure.java.io :as io]
             [clojure.string :as str]
-            [boot.core :as boot]))
+            [boot.core :as boot]
+            [boot.util :as util]))
 
 (def selector-regex #"\$\{(.+?)\}")
 
@@ -52,9 +53,12 @@
       cat)
     fileset))
 
-(defn fingerprint-asset [asset-path {:keys [input-root file-hashes]}]
-  (let [full-path (asset-full-path (str asset-path) input-root)]
-    (get file-hashes full-path asset-path)))
+(defn fingerprint-asset [asset-path {:keys [input-root file-hashes verbose?]}]
+  (let [full-path (asset-full-path (str asset-path) input-root)
+        fingerprinted-path (get file-hashes full-path asset-path)]
+    (when verbose?
+      (util/info (str "\tRenaming reference " asset-path " to " fingerprinted-path "\n")))
+    fingerprinted-path))
 
 (defn- last-index [s]
   (dec (count s)))
