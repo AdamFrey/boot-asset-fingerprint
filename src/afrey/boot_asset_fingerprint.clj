@@ -30,13 +30,14 @@
     (map fingerprint-file-path)
     files))
 
-(defn fingerprint-asset-files! [assets rename-map output-dir]
+(defn fingerprint-asset-files! [{:keys [assets file-hashes output-dir verbose?]}]
   (doseq [file assets
-          :let [out-file (->> file
-                           (:path)
-                           (get rename-map)
-                           (io/file output-dir))]]
+          :let [file-path (:path file)
+                out-file-path (get file-hashes file-path)
+                out-file (io/file output-dir out-file-path)]]
     (do
+      (when verbose?
+        (util/info (str "Renaming file " file-path " to " out-file-path "\n")))
       (io/make-parents out-file)
       (io/copy (core/tmp-file file) out-file))))
 
@@ -62,10 +63,12 @@
   (http://guides.rubyonrails.org/asset_pipeline.html#what-is-fingerprinting-and-why-should-i-care-questionmark) "
   [s skip                    bool  "Skips file fingerprinting and replaces each asset url with bare"
    e extensions        EXT   [str] "Add a file extension to indicate the files to process for asset references."
-   _ asset-host        HOST  str   "Host to prefix all asset urls with e.g. https://your-host.com"]
+   _ asset-host        HOST  str   "Host to prefix all asset urls with e.g. https://your-host.com"
+   v verbose                 bool  "Run task with verbose logging"]
   (let [prev       (atom nil)
         output-dir (core/tmp-dir!)
-        skip?      (boolean skip)]
+        skip?      (boolean skip)
+        verbose?   (boolean verbose)]
     (core/with-pre-wrap fileset
       (let [sources         (->> fileset
                               #_(core/fileset-diff @prev) ; Diff against previous fileset
@@ -73,14 +76,19 @@
                               (core/by-ext (or extensions default-source-extensions)))
             sources-paths   (into #{} (map :path) sources)
             assets          (if skip?
-                              [] ;; Don't rename any files if skip specified
+                              (do
+                                (when verbose? (util/info "Skipping asset fingerprinting\n"))
+                                [])
                               (assets-to-fingerprint fileset sources))
             file-rename-map (assets->file-rename-map assets)]
         (reset! prev fileset)
 
         (when (seq assets)
           (util/info "Asset Fingerprinting...\n")
-          (fingerprint-asset-files! assets file-rename-map output-dir))
+          (fingerprint-asset-files! {:assets      assets
+                                     :file-hashes file-rename-map
+                                     :output-dir  output-dir
+                                     :verbose?    verbose?}))
 
         (doseq [file sources
                 :let [original-path (:path file)
@@ -90,13 +98,16 @@
                       input-root    (path->parent-path original-path)
                       out-file      (io/file output-path)]]
           (do
+            (when verbose?
+              (util/info (str "Updating content in source file " path "\n")))
             (io/make-parents out-file)
             (let [new-file-content (-> (slurp input-path)
-                                     (impl/update-asset-references
-                                       {:input-root  input-root
-                                        :skip?       skip?
-                                        :asset-host  asset-host
-                                        :file-hashes file-rename-map}))]
+                                       (impl/update-asset-references
+                                        {:input-root  input-root
+                                         :skip?       skip?
+                                         :asset-host  asset-host
+                                         :file-hashes file-rename-map
+                                         :verbose?    verbose?}))]
               (spit out-file new-file-content))))
 
         (-> fileset
