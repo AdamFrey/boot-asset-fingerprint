@@ -18,6 +18,12 @@
   (when s
     (str/replace s (re-pattern (str (java.io.File/separator) "$")) "")))
 
+(defn- remove-asset-root [path asset-root]
+  (cond-> path
+    (not-empty asset-root)
+    (str/replace-first (re-pattern (str asset-root (java.io.File/separator)))
+                       "")))
+
 (defn asset-full-path
   "Return the full path of an asset, taking into account relative and absolute paths.
 
@@ -42,20 +48,21 @@
 (defn fingerprinted-asset-paths
   "Given a fileset returns a set of string paths to all desired
   assets that should be fingerprinted."
-  [fileset]
+  [fileset asset-root]
   (into #{}
-    (comp
-      (map (fn [file]
-             (let [file-text (slurp (boot/tmp-file file))]
-               (map (fn [[_ asset-path]]
-                      (asset-full-path asset-path (file-parent (:path file))))
-                 (re-seq selector-regex file-text)))))
-      cat)
-    fileset))
+        (comp
+         (map (fn [file]
+                (let [file-text (slurp (boot/tmp-file file))]
+                  (map (fn [[_ asset-path]]
+                         (asset-full-path asset-path asset-root))
+                       (re-seq selector-regex file-text)))))
+         cat)
+        fileset))
 
-(defn fingerprint-asset [asset-path {:keys [input-root file-hashes verbose?]}]
-  (let [full-path (asset-full-path (str asset-path) input-root)
-        fingerprinted-path (get file-hashes full-path asset-path)]
+(defn fingerprint-asset [asset-path {:keys [asset-root file-hashes verbose?]}]
+  (let [full-path (asset-full-path (str asset-path) asset-root)
+        fingerprinted-path (-> (get file-hashes full-path asset-path)
+                               (remove-asset-root asset-root))]
     (when verbose?
       (util/info (str "\tRenaming reference " asset-path " to " fingerprinted-path "\n")))
     fingerprinted-path))

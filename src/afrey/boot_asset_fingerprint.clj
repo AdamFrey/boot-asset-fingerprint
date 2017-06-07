@@ -18,9 +18,9 @@
 (defn assets-to-fingerprint
   "Given a fileset and a set of source files, return a seq of all files
   referenced in the source files."
-  [fileset source-files]
+  [fileset source-files asset-root]
   (when (seq source-files)
-    (let [assets-to-fingerprint (impl/fingerprinted-asset-paths source-files)]
+    (let [assets-to-fingerprint (impl/fingerprinted-asset-paths source-files asset-root)]
       (->> fileset
         (core/output-files)
         (filter #(contains? assets-to-fingerprint (:path %)))))))
@@ -64,7 +64,8 @@
   [s skip                    bool  "Skips file fingerprinting and replaces each asset url with bare"
    e extensions        EXT   [str] "Add a file extension to indicate the files to process for asset references."
    _ asset-host        HOST  str   "Host to prefix all asset urls with e.g. https://your-host.com"
-   v verbose                 bool  "Run task with verbose logging"]
+   a asset-root        ROOT  str   "The root dir where the assets are served from"
+   v verbose                 bool  "Run this task with verbose logging enabled"]
   (let [prev       (atom nil)
         output-dir (core/tmp-dir!)
         skip?      (boolean skip)
@@ -79,7 +80,7 @@
                               (do
                                 (when verbose? (util/info "Skipping asset fingerprinting\n"))
                                 [])
-                              (assets-to-fingerprint fileset sources))
+                              (assets-to-fingerprint fileset sources asset-root))
             file-rename-map (assets->file-rename-map assets)]
         (reset! prev fileset)
 
@@ -95,7 +96,6 @@
                       path          (get file-rename-map original-path original-path)
                       input-path    (-> file core/tmp-file .getPath)
                       output-path   (-> (io/file output-dir path) .getPath)
-                      input-root    (path->parent-path original-path)
                       out-file      (io/file output-path)]]
           (do
             (when verbose?
@@ -103,7 +103,7 @@
             (io/make-parents out-file)
             (let [new-file-content (-> (slurp input-path)
                                        (impl/update-asset-references
-                                        {:input-root  input-root
+                                        {:asset-root  asset-root
                                          :skip?       skip?
                                          :asset-host  asset-host
                                          :file-hashes file-rename-map
