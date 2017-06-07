@@ -52,6 +52,6 @@
 
 (deftest test-fingerprint
   (testing "absolutizes path without fingerprint when no corresponding hash"
-    (is (= "/style.css" (fingerprint "${style.css}" {})))) 
+    (is (= "/style.css" (update-asset-references "${style.css}" {}))))
   (testing "replaces the template with the fingerprinted file"
-    (is (= "/style-123.css" (fingerprint "${style.css}" {:file-hashes {"style.css" "style-123.css"}})))))
+    (is (= "/style-123.css" (update-asset-references "${style.css}" {:file-hashes {"style.css" "style-123.css"}})))))
